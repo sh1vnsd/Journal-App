@@ -2,22 +2,24 @@ package com.project.journalApp.entity;
 
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.ZoneId;
+
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Document(collection = "journal_entries") //This annotation tells that this entity is mapped with mongodb collection
 @Data
-public class JournalEntry {
+@NoArgsConstructor
+public class JournalEntity {
 
-    @Id     //Datatype for mongodb id
+    @Id
     private ObjectId id;
+            //Datatype for mongodb id
 
+    @NonNull
     private String title;
 
     private String content;

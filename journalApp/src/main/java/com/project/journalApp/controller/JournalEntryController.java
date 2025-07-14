@@ -1,8 +1,9 @@
 package com.project.journalApp.controller;
 
-import com.project.journalApp.entity.JournalEntry;
-import com.project.journalApp.repository.JournalEntryRepo;
+import com.project.journalApp.entity.JournalEntity;
+import com.project.journalApp.entity.UserEntity;
 import com.project.journalApp.service.JournalEntryService;
+import com.project.journalApp.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,27 +15,31 @@ import java.util.*;
 
 @RestController //Special Typo Component
 @RequestMapping("/journal") //Add mapping to whole class
-public class JournalEntryControllerV2 {
+public class JournalEntryController {
 
     //Specific Endpoints Will Be Written Here
 
     @Autowired
     private JournalEntryService journalEntryService;
 
-    @PostMapping
-    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry entry) {
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("{userName}")
+    public ResponseEntity<JournalEntity> createEntry(@RequestBody JournalEntity entry, @PathVariable String userName) {
         try{
             entry.setDate(LocalDateTime.now());
-            journalEntryService.saveEntry(entry);
+            journalEntryService.saveEntry(entry, userName);
             return new ResponseEntity<>(entry, HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAll(){
-        List<JournalEntry> all = journalEntryService.getAll();
+    @GetMapping("{userName}")
+    public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String userName){
+        UserEntity user = userService.findByUserName(userName);
+        List<JournalEntity> all = user.getJournalEntries();
         if(all != null && !all.isEmpty()){
             return new ResponseEntity<>(all, HttpStatus.OK);
         }
@@ -43,30 +48,34 @@ public class JournalEntryControllerV2 {
 
 
     @GetMapping("id/{id}")
-    public ResponseEntity<JournalEntry> getEntryById(@PathVariable ObjectId id) {
-        Optional<JournalEntry> journalEntry = journalEntryService.findById(id);
+    public ResponseEntity<JournalEntity> getEntryById(@PathVariable ObjectId id) {
+        Optional<JournalEntity> journalEntry = journalEntryService.findById(id);
         if(journalEntry.isPresent()){
             return new ResponseEntity<>(journalEntry.get(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("id/{myId}")
-    public ResponseEntity<?> deleteEntryById(@PathVariable ObjectId myId) {
+    @DeleteMapping("id/{userName}/{myId}")
+    public ResponseEntity<?> deleteEntryById(@PathVariable ObjectId myId, @PathVariable String userName) {
                         //? means wildcard pattern (not important to give entity class)
-         journalEntryService.deleteById(myId);
+         journalEntryService.deleteById(myId, userName);
          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/id/{id}")
-    public  ResponseEntity<?> updateJournalById(@PathVariable ObjectId id, @RequestBody JournalEntry newEntry) {
-        JournalEntry old = journalEntryService.findById(id).orElse(null);
+    @PutMapping("/id/{userName}/{id}")
+    public  ResponseEntity<?> updateJournalById(
+            @PathVariable ObjectId id,
+            @RequestBody JournalEntity newEntry,
+            @PathVariable String userName) {
+
+        JournalEntity old = journalEntryService.findById(id).orElse(null);
         if(old != null){
             old.setTitle(newEntry.getTitle() != null && !newEntry.getTitle().equals("") ? newEntry.getTitle() : old.getTitle());
             old.setContent(newEntry.getContent() != null && !newEntry.getContent().equals("") ? newEntry.getContent() : old.getContent());
             journalEntryService.saveEntry(old);
             return new ResponseEntity<>(old, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
