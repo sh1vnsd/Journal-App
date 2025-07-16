@@ -31,4 +31,5 @@ public class UserEntity {
             //Acting like a foreign key
     private List<JournalEntity> journalEntries = new ArrayList<>();
 
+    private List<String> roles;
 }
