@@ -1,6 +1,5 @@
 package com.project.journalApp.service;
 
-import com.project.journalApp.entity.JournalEntity;
 import com.project.journalApp.entity.UserEntity;
 import com.project.journalApp.repository.UserRepo;
 import org.bson.types.ObjectId;
@@ -21,14 +20,13 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public void saveEntry(UserEntity userEntity){
+    public void saveNewUser(UserEntity userEntity){
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
         userEntity.setRoles(Arrays.asList("USER"));
         userRepo.save(userEntity);
     }
 
-    public void saveNewUser(UserEntity userEntity){
-        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+    public void saveUser(UserEntity userEntity){
         userRepo.save(userEntity);
     }
 
