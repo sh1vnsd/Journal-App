@@ -27,15 +27,6 @@ public class UserServiceTests {
     @Autowired
     private UserService userService;
 
-//    @BeforeEach //Before running each test first this will run
-//    void setUp(){
-//
-//    }
-
-//    @AfterAll
-//    void setUp(){
-//
-//    }
 
     @ParameterizedTest
     @ArgumentsSource(UserArgumentsProvider.class)
