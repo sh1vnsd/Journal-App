@@ -1,6 +1,7 @@
 package com.project.journalApp.entity;
 
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Document(collection = "users") //This annotation tells that this entity is mapped with mongodb collection
 @Data
+@Builder
 public class UserEntity {
 
     @Id
